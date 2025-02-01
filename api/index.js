@@ -1,48 +1,36 @@
-// HINTS:
-// 1. Import express and axios 
 import express from "express";
-import axios from "axios" ;
+import axios from "axios";
+import { VercelRequest, VercelResponse } from "@vercel/node";
+
 const app = express();
-const port = 3000;
- 
+
+// Set EJS as the view engine
+app.set("views", "views"); 
+app.set("view engine", "ejs");
+
 app.use(express.static("public"));
 
-app.get("/", async (req,res) =>{
-    try {
-    
-  const linkForApi = await axios.get("https://secrets-api.appbrewery.com/random");
-  res.render("index.ejs", {
-    secret : linkForApi.data.secret,
-    user : linkForApi.data.username,
-    id : linkForApi.data.id,
-    timestamps : linkForApi.data.timestamp
-  }) 
-    } catch(error){
-        console.log(error.response.data)
-        res.status("500")
-    }
-
-})
-
-app.get("/refresh", (req,res) =>{
-  res.redirect("/")
+// Home Route
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("https://secrets-api.appbrewery.com/random");
+    res.render("index.ejs", {
+      secret: response.data.secret,
+      user: response.data.username,
+      id: response.data.id
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
-
-
-app.listen(port , () => {
-    console.log(`listining to port ${port}`)
+// Refresh Route
+app.get("/refresh", (req, res) => {
+  res.redirect("/");
 });
 
-
-
-// 2. Create an express app and set the port number.
-
-// 3. Use the public folder for static files.
-
-// 4. When the user goes to the home page it should render the index.ejs file.
-
-// 5. Use axios to get a random secret and pass it to index.ejs to display the
-// secret and the username of the secret.
-
-// 6. Listen on your predefined port and start the server.
+// Export as a serverless function
+export default function handler(req, res) {
+  return app(req, res);
+}
