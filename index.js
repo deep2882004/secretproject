@@ -24,7 +24,9 @@ app.get("/", async (req,res) =>{
 
 })
 
-
+app.get("/refresh", (req,res) =>{
+  res.redirect("/")
+});
 
 
 
