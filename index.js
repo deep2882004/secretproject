@@ -11,23 +11,20 @@ app.use(express.static("public"));
 
 
 
-app.get("/", async (req,res) =>{
+app.get("/", async (req, res) => {
     try {
-    
-  const linkForApi = await axios.get("https://secrets-api.appbrewery.com/random");
-  res.render("index.ejs", {
-    secret : linkForApi.data.secret,
-    user : linkForApi.data.username,
-    id : linkForApi.data.id,
-    timestamps : linkForApi.data.timestamp
-  }) 
-    } catch(error){
-        console.log(error.response.data)
-        res.status("500")
+        const linkForApi = await axios.get("https://secrets-api.appbrewery.com/random");
+        res.render("index.ejs", {
+            secret: linkForApi.data.secret,
+            user: linkForApi.data.username,
+            id: linkForApi.data.id,
+            
+        });
+    } catch (error) {
+        console.error("Error fetching API data:", error.message);
+        res.status(500).send("Internal Server Error");
     }
-
-})
-
+});
 app.get("/refresh", (req,res) =>{
   res.redirect("/")
 });
